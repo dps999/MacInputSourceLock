@@ -7,22 +7,12 @@ BUILD_PATH="$ROOT_DIR/.build/release/MacStaticLanguage"
 AGENT_LABEL="com.macstaticlanguage.agent"
 PLIST_PATH="$HOME/Library/LaunchAgents/$AGENT_LABEL.plist"
 LOG_DIR="$HOME/Library/Logs/MacStaticLanguage"
-ENVIRONMENT_BLOCK=""
 
 mkdir -p "$HOME/Library/LaunchAgents"
 mkdir -p "$LOG_DIR"
 
 cd "$ROOT_DIR"
 swift build -c release
-
-if [[ -n "${MACSTATICLANGUAGE_INPUT_SOURCE_ID:-}" || -n "${MACSTATICLANGUAGE_POLL_INTERVAL:-}" ]]; then
-ENVIRONMENT_BLOCK=$(cat <<EOF
-    <key>EnvironmentVariables</key>
-    <dict>
-$(if [[ -n "${MACSTATICLANGUAGE_INPUT_SOURCE_ID:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_INPUT_SOURCE_ID</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_INPUT_SOURCE_ID"; fi)$(if [[ -n "${MACSTATICLANGUAGE_POLL_INTERVAL:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_POLL_INTERVAL</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_POLL_INTERVAL"; fi)    </dict>
-EOF
-)
-fi
 
 cat > "$PLIST_PATH" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -35,7 +25,11 @@ cat > "$PLIST_PATH" <<PLIST
     <array>
         <string>$BUILD_PATH</string>
     </array>
-$ENVIRONMENT_BLOCK
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>MACSTATICLANGUAGE_LAUNCHED_BY_AGENT</key>
+        <string>1</string>
+$(if [[ -n "${MACSTATICLANGUAGE_INPUT_SOURCE_ID:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_INPUT_SOURCE_ID</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_INPUT_SOURCE_ID"; fi)$(if [[ -n "${MACSTATICLANGUAGE_POLL_INTERVAL:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_POLL_INTERVAL</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_POLL_INTERVAL"; fi)$(if [[ "${MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT:-}" == "1" ]]; then printf '        <key>MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT</key>\n        <string>1</string>\n'; fi)    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>

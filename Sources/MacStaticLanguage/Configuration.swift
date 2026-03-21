@@ -12,7 +12,7 @@ struct Configuration {
     static func parse(arguments: [String]) throws -> Configuration {
         var inputSourceID = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_INPUT_SOURCE_ID"] ?? defaultInputSourceID
         var pollInterval = defaultPollInterval
-        var promptForAccessibility = true
+        var promptForAccessibility = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT"] != "1"
         var listInputSources = false
 
         if let environmentPollInterval = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_POLL_INTERVAL"] {

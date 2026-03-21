@@ -1,94 +1,230 @@
 # MacStaticLanguage
 
-`MacStaticLanguage` is a small macOS background utility that keeps your keyboard input source on English whenever the focused app or focused window changes. It is intended to override macOS behaviors such as per-window input source switching and Spotlight stealing the previous layout.
+MacStaticLanguage is a native macOS menu bar utility that forces the keyboard input source back to English when focus changes between apps or windows.
 
-The default enforced input source is `com.apple.keylayout.ABC`, which is the standard English layout on current macOS versions.
+It is intended for the specific macOS behavior where input language follows the last active window, document, or Spotlight session. With this app running, the system is pushed back to a fixed English layout after those focus changes happen.
 
-## What It Does
+By default, the enforced input source is:
 
-- Monitors the frontmost application.
-- Polls the focused window or focused UI element so window-to-window changes inside the same app are also detected.
-- Switches the keyboard layout back to the configured English input source when focus changes.
-- Can run automatically at login through a LaunchAgent.
+`com.apple.keylayout.ABC`
+
+## Features
+
+- Forces English again when the frontmost app changes.
+- Detects window changes inside the same app.
+- Handles common cases like Spotlight switching to a previous layout.
+- Runs as a menu bar app with a visible tray icon.
+- Shows current status from the tray menu.
+- Supports `Run at Startup` from the tray menu.
+- Supports manual LaunchAgent install scripts.
+- Lets you choose a different English keyboard layout ID such as `US`.
 
 ## Requirements
 
 - macOS 13 or later
 - Xcode 16.4 or a compatible Swift 6 toolchain
-- Accessibility permission for the process
+- Accessibility permission for the app
+
+## Permissions
+
+MacStaticLanguage requires this macOS permission:
+
+- `Accessibility`
+
+It uses Accessibility APIs to detect the focused app, focused window, and focused UI element. Without that permission, the app can stay running in the menu bar, but it cannot reliably detect focus changes and switch the keyboard layout back to English.
+
+## Quick Start
+
+After cloning the repository:
+
+```bash
+git clone <repo-url>
+cd macstaticlanguage
+swift build -c release
+./.build/release/MacStaticLanguage
+```
+
+On first launch, macOS should ask for Accessibility permission. Approve it in:
+
+`System Settings > Privacy & Security > Accessibility`
+
+If the prompt does not appear, launch the app once and add the executable manually in that settings panel.
+
+When the app is running, you should see a `lock + EN` item in the menu bar.
 
 ## Build
+
+Debug build:
 
 ```bash
 swift build
 ```
 
-## List Available Input Sources
-
-Use this first if you want `US` instead of `ABC` or if your English layout uses a different ID:
+Release build:
 
 ```bash
-swift run MacStaticLanguage --list-input-sources
+swift build -c release
 ```
 
-The current selection is marked with `*`.
+## Run
 
-## Run Manually
+Run the debug build with SwiftPM:
 
 ```bash
 swift run MacStaticLanguage
 ```
 
-To enforce a different layout ID:
+Run the compiled release binary directly:
+
+```bash
+./.build/release/MacStaticLanguage
+```
+
+## Choose the English Layout
+
+List available selectable keyboard layouts:
+
+```bash
+swift run MacStaticLanguage --list-input-sources
+```
+
+Example output:
+
+```text
+  com.apple.keylayout.ABC | ABC
+  com.apple.keylayout.Greek | Greek
+* com.apple.keylayout.Russian | Russian
+```
+
+To use `US` instead of `ABC`:
 
 ```bash
 swift run MacStaticLanguage --input-source-id com.apple.keylayout.US
 ```
 
-You can also set the ID with an environment variable:
+You can also use an environment variable:
 
 ```bash
 MACSTATICLANGUAGE_INPUT_SOURCE_ID=com.apple.keylayout.US swift run MacStaticLanguage
 ```
 
-## Install At Login
+## Menu Bar Usage
+
+When the app is running, click the tray icon to open the menu. The menu shows:
+
+- Whether the app is running normally or waiting for Accessibility permission
+- The target input source ID
+- The current input source ID
+- The last event handled by the app
+- A `Run at Startup` toggle
+- A shortcut to macOS Accessibility settings
+- A `Quit` action
+
+## Run at Startup
+
+The simplest way is from the tray menu:
+
+1. Start the app normally.
+2. Click the menu bar icon.
+3. Enable `Run at Startup`.
+
+This creates a LaunchAgent in:
+
+`~/Library/LaunchAgents/com.macstaticlanguage.agent.plist`
+
+The startup item does not change the permission model. The launched app still needs `Accessibility` permission.
+
+You can also install startup manually:
 
 ```bash
 chmod +x Scripts/install-launch-agent.sh Scripts/uninstall-launch-agent.sh
 ./Scripts/install-launch-agent.sh
 ```
 
-The install script builds the project in release mode and installs `~/Library/LaunchAgents/com.macstaticlanguage.agent.plist`.
-
-To install with a different English layout:
+To install startup with a different layout:
 
 ```bash
 MACSTATICLANGUAGE_INPUT_SOURCE_ID=com.apple.keylayout.US ./Scripts/install-launch-agent.sh
 ```
 
-## Uninstall
+To remove startup:
 
 ```bash
 ./Scripts/uninstall-launch-agent.sh
 ```
 
-## Accessibility Permission
+## Command Line Options
 
-The first run opens the macOS accessibility prompt. After that, approve `MacStaticLanguage` in:
+```text
+--input-source-id <id>     Keyboard input source to enforce
+--poll-interval <seconds>  Focus polling interval
+--list-input-sources       Print available keyboard input source IDs and exit
+--no-accessibility-prompt  Do not open the macOS accessibility prompt
+--help, -h                 Show help
+```
 
-`System Settings > Privacy & Security > Accessibility`
+## How to Verify It Is Working
 
-If the prompt does not appear, run:
+Check that the process is running:
+
+```bash
+pgrep -fl MacStaticLanguage
+```
+
+If it is installed at startup, check the LaunchAgent:
+
+```bash
+launchctl print gui/$UID/com.macstaticlanguage.agent
+```
+
+Practical test:
+
+1. Switch to a non-English layout.
+2. Open Spotlight or switch to another app or window.
+3. The layout should switch back to English.
+
+## Troubleshooting
+
+If the app starts but does not switch layouts:
+
+- Confirm Accessibility permission is granted.
+- Open the tray menu and check the status text.
+- Make sure the target input source ID exists on your Mac.
+- Run `--list-input-sources` and use the exact ID returned by macOS.
+
+If the Accessibility prompt does not appear:
 
 ```bash
 swift run MacStaticLanguage
 ```
 
-and then add the built executable manually from:
+Then add the executable manually in Accessibility settings.
+
+If you want to add the debug binary manually, it is usually here:
 
 `/Users/.../macstaticlanguage/.build/debug/MacStaticLanguage`
 
+If you run the release build, use the release binary path instead:
+
+`/Users/.../macstaticlanguage/.build/release/MacStaticLanguage`
+
+## Repository Layout
+
+```text
+Sources/MacStaticLanguage/
+  Configuration.swift
+  InputSourceManager.swift
+  LanguageEnforcer.swift
+  LaunchAgentManager.swift
+  MacStaticLanguageApp.swift
+  StatusItemController.swift
+
+Scripts/
+  install-launch-agent.sh
+  uninstall-launch-agent.sh
+```
+
 ## Notes
 
-- This utility is designed for your exact case: force English again when app focus changes, window focus changes, or Spotlight becomes active.
-- If macOS `Automatically switch to a document's input source` is enabled, this utility should still push the layout back to English after the focus change happens.
+- The app is built for the exact workflow of keeping English fixed after macOS focus changes.
+- If macOS `Automatically switch to a document's input source` is enabled, this app still attempts to override that by switching back after focus changes.

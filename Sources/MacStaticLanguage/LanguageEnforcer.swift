@@ -15,6 +15,7 @@ final class LanguageEnforcer: NSObject {
     private var permissionTimer: Timer?
     private var lastFocusSignature: FocusSignature?
     private var hasPromptedForAccessibility = false
+    var onStatusChange: ((EnforcerStatus) -> Void)?
 
     init(configuration: Configuration) {
         self.configuration = configuration
@@ -31,6 +32,7 @@ final class LanguageEnforcer: NSObject {
         observeWorkspaceNotifications()
         forceInputSource(reason: "startup")
         startMonitoringIfTrusted()
+        publishStatus(lastEvent: "startup")
     }
 
     private func printInputSources() {
@@ -116,6 +118,8 @@ final class LanguageEnforcer: NSObject {
             permissionTimer = nil
             scheduleFocusTimer()
             evaluateFocusChange(force: true)
+        } else {
+            publishStatus(lastEvent: "waiting for accessibility")
         }
     }
 
@@ -204,8 +208,19 @@ final class LanguageEnforcer: NSObject {
             if changed {
                 print("Switched input source to \(configuration.inputSourceID) (\(reason)).")
             }
+            publishStatus(lastEvent: changed ? "switched on \(reason)" : "already English on \(reason)")
         } catch {
             fputs("MacStaticLanguage error: \(error.localizedDescription)\n", stderr)
+            publishStatus(lastEvent: "error: \(error.localizedDescription)")
         }
+    }
+
+    private func publishStatus(lastEvent: String) {
+        onStatusChange?(EnforcerStatus(
+            targetInputSourceID: configuration.inputSourceID,
+            currentInputSourceID: inputSourceManager.currentInputSourceID(),
+            accessibilityTrusted: accessibilityTrusted(prompt: false),
+            lastEvent: lastEvent
+        ))
     }
 }
