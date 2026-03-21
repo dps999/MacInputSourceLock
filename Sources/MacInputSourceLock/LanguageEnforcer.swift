@@ -9,11 +9,14 @@ private struct FocusSignature: Equatable {
 
 @MainActor
 final class LanguageEnforcer: NSObject {
+    private static let enforcementRetryDelays: [TimeInterval] = [0.12, 0.35, 0.7]
+
     private let configuration: Configuration
     private let inputSourceManager = InputSourceManager()
     private var focusTimer: Timer?
     private var permissionTimer: Timer?
     private var lastFocusSignature: FocusSignature?
+    private var enforcementGeneration = 0
     private var hasPromptedForAccessibility = false
     var onStatusChange: ((EnforcerStatus) -> Void)?
 
@@ -30,7 +33,7 @@ final class LanguageEnforcer: NSObject {
         }
 
         observeWorkspaceNotifications()
-        forceInputSource(reason: "startup")
+        reinforceInputSource(reason: "startup")
         startMonitoringIfTrusted()
         publishStatus(lastEvent: "startup")
     }
@@ -60,14 +63,13 @@ final class LanguageEnforcer: NSObject {
     @objc
     private func activeApplicationDidChange(_ notification: Notification) {
         lastFocusSignature = nil
-        forceInputSource(reason: "application activation")
-        evaluateFocusChange(force: true)
+        evaluateFocusChange(force: true, reason: "application activation")
     }
 
     private func startMonitoringIfTrusted() {
         if accessibilityTrusted(prompt: configuration.promptForAccessibility) {
             scheduleFocusTimer()
-            evaluateFocusChange(force: true)
+            evaluateFocusChange(force: true, reason: "initial focus check")
             return
         }
 
@@ -107,7 +109,7 @@ final class LanguageEnforcer: NSObject {
 
     @objc
     private func handleFocusTimer(_ timer: Timer) {
-        evaluateFocusChange()
+        evaluateFocusChange(reason: "focus change")
     }
 
     @objc
@@ -117,7 +119,7 @@ final class LanguageEnforcer: NSObject {
             timer.invalidate()
             permissionTimer = nil
             scheduleFocusTimer()
-            evaluateFocusChange(force: true)
+            evaluateFocusChange(force: true, reason: "initial focus check")
         } else {
             publishStatus(lastEvent: "waiting for accessibility")
         }
@@ -137,18 +139,40 @@ final class LanguageEnforcer: NSObject {
         return trusted
     }
 
-    private func evaluateFocusChange(force: Bool = false) {
+    private func evaluateFocusChange(force: Bool = false, reason: String = "focus change") {
         guard accessibilityTrusted(prompt: false) else {
             return
         }
 
         guard let signature = currentFocusSignature() else {
+            if force {
+                reinforceInputSource(reason: reason)
+            }
             return
         }
 
         if force || signature != lastFocusSignature {
             lastFocusSignature = signature
-            forceInputSource(reason: "focus change")
+            reinforceInputSource(reason: reason)
+        }
+    }
+
+    private func reinforceInputSource(reason: String) {
+        enforcementGeneration += 1
+        let generation = enforcementGeneration
+
+        forceInputSource(reason: reason)
+
+        for delay in Self.enforcementRetryDelays {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                Task { @MainActor [weak self] in
+                    guard let self, self.enforcementGeneration == generation else {
+                        return
+                    }
+
+                    self.forceInputSource(reason: "\(reason) retry")
+                }
+            }
         }
     }
 
