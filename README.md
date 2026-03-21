@@ -25,6 +25,20 @@ By default, the enforced input source is:
 - Xcode 16.4 or a compatible Swift 6 toolchain
 - Accessibility permission for the app
 
+## Download
+
+GitHub Releases now ship a zipped app bundle instead of a raw executable:
+
+- Download `MacInputSourceLock-<version>-macos-<arch>.zip` from the release page
+- Move `MacInputSourceLock.app` to `/Applications`
+- On first launch, use Finder `Open` once to bypass the unsigned-app warning
+
+If Gatekeeper still blocks the app after moving it, remove the quarantine flag manually:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/MacInputSourceLock.app
+```
+
 ## Permissions
 
 MacInputSourceLock requires this macOS permission:
@@ -65,6 +79,17 @@ Release build:
 ```bash
 swift build -c release
 ```
+
+Package an unsigned `.app` bundle and zip it for GitHub Releases:
+
+```bash
+./Scripts/package-app.sh v0.1.0
+```
+
+This writes:
+
+- `dist/MacInputSourceLock.app`
+- `dist/MacInputSourceLock-v0.1.0-macos-arm64.zip` on Apple Silicon Macs
 
 ## Run
 
@@ -127,6 +152,8 @@ The simplest way is from the tray menu:
 1. Start the app normally.
 2. Click the menu bar icon.
 3. Enable `Run at Startup`.
+
+If you are using the packaged app, move it to a stable path such as `/Applications` before enabling `Run at Startup`.
 
 This creates a LaunchAgent in:
 
