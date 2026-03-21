@@ -3,10 +3,10 @@
 set -euo pipefail
 
 ROOT_DIR=${0:A:h:h}
-BUILD_PATH="$ROOT_DIR/.build/release/MacStaticLanguage"
-AGENT_LABEL="com.macstaticlanguage.agent"
+BUILD_PATH="$ROOT_DIR/.build/release/MacInputSourceLock"
+AGENT_LABEL="com.macinputsourcelock.agent"
 PLIST_PATH="$HOME/Library/LaunchAgents/$AGENT_LABEL.plist"
-LOG_DIR="$HOME/Library/Logs/MacStaticLanguage"
+LOG_DIR="$HOME/Library/Logs/MacInputSourceLock"
 
 mkdir -p "$HOME/Library/LaunchAgents"
 mkdir -p "$LOG_DIR"
@@ -27,9 +27,9 @@ cat > "$PLIST_PATH" <<PLIST
     </array>
     <key>EnvironmentVariables</key>
     <dict>
-        <key>MACSTATICLANGUAGE_LAUNCHED_BY_AGENT</key>
+        <key>MACINPUTSOURCELOCK_LAUNCHED_BY_AGENT</key>
         <string>1</string>
-$(if [[ -n "${MACSTATICLANGUAGE_INPUT_SOURCE_ID:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_INPUT_SOURCE_ID</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_INPUT_SOURCE_ID"; fi)$(if [[ -n "${MACSTATICLANGUAGE_POLL_INTERVAL:-}" ]]; then printf '        <key>MACSTATICLANGUAGE_POLL_INTERVAL</key>\n        <string>%s</string>\n' "$MACSTATICLANGUAGE_POLL_INTERVAL"; fi)$(if [[ "${MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT:-}" == "1" ]]; then printf '        <key>MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT</key>\n        <string>1</string>\n'; fi)    </dict>
+$(if [[ -n "${MACINPUTSOURCELOCK_INPUT_SOURCE_ID:-}" ]]; then printf '        <key>MACINPUTSOURCELOCK_INPUT_SOURCE_ID</key>\n        <string>%s</string>\n' "$MACINPUTSOURCELOCK_INPUT_SOURCE_ID"; fi)$(if [[ -n "${MACINPUTSOURCELOCK_POLL_INTERVAL:-}" ]]; then printf '        <key>MACINPUTSOURCELOCK_POLL_INTERVAL</key>\n        <string>%s</string>\n' "$MACINPUTSOURCELOCK_POLL_INTERVAL"; fi)$(if [[ "${MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT:-}" == "1" ]]; then printf '        <key>MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT</key>\n        <string>1</string>\n'; fi)    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
@@ -54,6 +54,6 @@ echo "Installed $AGENT_LABEL"
 echo "Logs:"
 echo "  $LOG_DIR/stdout.log"
 echo "  $LOG_DIR/stderr.log"
-if [[ -n "${MACSTATICLANGUAGE_INPUT_SOURCE_ID:-}" ]]; then
-    echo "Input source override: $MACSTATICLANGUAGE_INPUT_SOURCE_ID"
+if [[ -n "${MACINPUTSOURCELOCK_INPUT_SOURCE_ID:-}" ]]; then
+    echo "Input source override: $MACINPUTSOURCELOCK_INPUT_SOURCE_ID"
 fi

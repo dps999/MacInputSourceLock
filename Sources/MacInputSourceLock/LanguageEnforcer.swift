@@ -132,7 +132,7 @@ final class LanguageEnforcer: NSObject {
         let options = ["AXTrustedCheckOptionPrompt": shouldPrompt] as CFDictionary
         let trusted = AXIsProcessTrustedWithOptions(options)
         if !trusted && shouldPrompt {
-            print("Accessibility permission is required. Approve MacStaticLanguage in System Settings > Privacy & Security > Accessibility.")
+            print("Accessibility permission is required. Approve MacInputSourceLock in System Settings > Privacy & Security > Accessibility.")
         }
         return trusted
     }
@@ -210,7 +210,7 @@ final class LanguageEnforcer: NSObject {
             }
             publishStatus(lastEvent: changed ? "switched on \(reason)" : "already English on \(reason)")
         } catch {
-            fputs("MacStaticLanguage error: \(error.localizedDescription)\n", stderr)
+            fputs("MacInputSourceLock error: \(error.localizedDescription)\n", stderr)
             publishStatus(lastEvent: "error: \(error.localizedDescription)")
         }
     }

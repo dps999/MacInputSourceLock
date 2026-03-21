@@ -59,7 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func presentErrorAlert(message: String) {
         let alert = NSAlert()
         alert.alertStyle = .warning
-        alert.messageText = "MacStaticLanguage"
+        alert.messageText = "MacInputSourceLock"
         alert.informativeText = message
         alert.runModal()
     }
@@ -67,7 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 @main
 @MainActor
-struct MacStaticLanguageApp {
+struct MacInputSourceLockApp {
     static func main() {
         do {
             let configuration = try Configuration.parse(arguments: CommandLine.arguments)

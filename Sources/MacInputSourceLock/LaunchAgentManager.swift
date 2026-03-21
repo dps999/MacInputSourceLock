@@ -28,7 +28,7 @@ struct LaunchAgentToggleResult {
 }
 
 final class LaunchAgentManager {
-    static let agentLabel = "com.macstaticlanguage.agent"
+    static let agentLabel = "com.macinputsourcelock.agent"
 
     private let configuration: Configuration
     private let executableURL: URL
@@ -90,7 +90,7 @@ final class LaunchAgentManager {
     }
 
     private var isCurrentProcessManagedByLaunchAgent: Bool {
-        ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_LAUNCHED_BY_AGENT"] == "1"
+        ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_LAUNCHED_BY_AGENT"] == "1"
     }
 
     private var launchAgentsDirectoryURL: URL {
@@ -98,7 +98,7 @@ final class LaunchAgentManager {
     }
 
     private var logsDirectoryURL: URL {
-        fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/MacStaticLanguage", isDirectory: true)
+        fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Library/Logs/MacInputSourceLock", isDirectory: true)
     }
 
     private var plistURL: URL {
@@ -128,13 +128,13 @@ final class LaunchAgentManager {
 
     private func writePlist() throws {
         var environmentVariables: [String: String] = [
-            "MACSTATICLANGUAGE_INPUT_SOURCE_ID": configuration.inputSourceID,
-            "MACSTATICLANGUAGE_POLL_INTERVAL": String(configuration.pollInterval),
-            "MACSTATICLANGUAGE_LAUNCHED_BY_AGENT": "1",
+            "MACINPUTSOURCELOCK_INPUT_SOURCE_ID": configuration.inputSourceID,
+            "MACINPUTSOURCELOCK_POLL_INTERVAL": String(configuration.pollInterval),
+            "MACINPUTSOURCELOCK_LAUNCHED_BY_AGENT": "1",
         ]
 
         if !configuration.promptForAccessibility {
-            environmentVariables["MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT"] = "1"
+            environmentVariables["MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT"] = "1"
         }
 
         let plist: [String: Any] = [

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-AGENT_LABEL="com.macstaticlanguage.agent"
+AGENT_LABEL="com.macinputsourcelock.agent"
 PLIST_PATH="$HOME/Library/LaunchAgents/$AGENT_LABEL.plist"
 
 launchctl bootout "gui/$UID" "$PLIST_PATH" >/dev/null 2>&1 || true

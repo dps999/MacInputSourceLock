@@ -10,12 +10,12 @@ struct Configuration {
     static let defaultPollInterval: TimeInterval = 0.5
 
     static func parse(arguments: [String]) throws -> Configuration {
-        var inputSourceID = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_INPUT_SOURCE_ID"] ?? defaultInputSourceID
+        var inputSourceID = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_INPUT_SOURCE_ID"] ?? defaultInputSourceID
         var pollInterval = defaultPollInterval
-        var promptForAccessibility = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_NO_ACCESSIBILITY_PROMPT"] != "1"
+        var promptForAccessibility = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT"] != "1"
         var listInputSources = false
 
-        if let environmentPollInterval = ProcessInfo.processInfo.environment["MACSTATICLANGUAGE_POLL_INTERVAL"] {
+        if let environmentPollInterval = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_POLL_INTERVAL"] {
             guard let value = Double(environmentPollInterval), value > 0 else {
                 throw ConfigurationError.invalidPollInterval(environmentPollInterval)
             }
@@ -84,7 +84,7 @@ enum ConfigurationError: Error, LocalizedError {
     }
 
     private static let usage = """
-    Usage: MacStaticLanguage [options]
+    Usage: MacInputSourceLock [options]
 
       --input-source-id <id>     Keyboard input source to enforce. Default: \(Configuration.defaultInputSourceID)
       --poll-interval <seconds>  Focus polling interval. Default: \(Configuration.defaultPollInterval)

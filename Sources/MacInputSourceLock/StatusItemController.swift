@@ -27,7 +27,7 @@ final class StatusItemController: NSObject {
     }
 
     func update(status: EnforcerStatus) {
-        stateItem.title = status.accessibilityTrusted ? "MacStaticLanguage is running" : "Waiting for Accessibility permission"
+        stateItem.title = status.accessibilityTrusted ? "MacInputSourceLock is running" : "Waiting for Accessibility permission"
         targetItem.title = "Target: \(status.targetInputSourceID)"
         currentItem.title = "Current: \(status.currentInputSourceID ?? "unknown")"
         accessibilityItem.title = "Accessibility: \(status.accessibilityTrusted ? "granted" : "not granted")"
@@ -44,11 +44,11 @@ final class StatusItemController: NSObject {
             return
         }
 
-        button.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MacStaticLanguage")
+        button.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MacInputSourceLock")
         button.image?.isTemplate = true
         button.title = " EN"
         button.imagePosition = .imageLeading
-        button.toolTip = "MacStaticLanguage"
+        button.toolTip = "MacInputSourceLock"
     }
 
     private func configureMenu() {
@@ -97,8 +97,8 @@ final class StatusItemController: NSObject {
         }
 
         button.toolTip = accessibilityTrusted
-            ? "MacStaticLanguage is running"
-            : "MacStaticLanguage is waiting for Accessibility permission"
+            ? "MacInputSourceLock is running"
+            : "MacInputSourceLock is waiting for Accessibility permission"
     }
 
     @objc

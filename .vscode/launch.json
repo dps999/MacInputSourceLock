@@ -4,21 +4,21 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:macstaticlanguage}",
-            "name": "Debug MacStaticLanguage",
-            "target": "MacStaticLanguage",
+            "cwd": "${workspaceFolder:macinputsourcelock}",
+            "name": "Debug MacInputSourceLock",
+            "target": "MacInputSourceLock",
             "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug MacStaticLanguage"
+            "preLaunchTask": "swift: Build Debug MacInputSourceLock"
         },
         {
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:macstaticlanguage}",
-            "name": "Release MacStaticLanguage",
-            "target": "MacStaticLanguage",
+            "cwd": "${workspaceFolder:macinputsourcelock}",
+            "name": "Release MacInputSourceLock",
+            "target": "MacInputSourceLock",
             "configuration": "release",
-            "preLaunchTask": "swift: Build Release MacStaticLanguage"
+            "preLaunchTask": "swift: Build Release MacInputSourceLock"
         }
     ]
 }

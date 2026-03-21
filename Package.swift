@@ -3,20 +3,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "macstaticlanguage",
+    name: "macinputsourcelock",
     platforms: [
         .macOS(.v13),
     ],
     products: [
         .executable(
-            name: "MacStaticLanguage",
-            targets: ["MacStaticLanguage"]
+            name: "MacInputSourceLock",
+            targets: ["MacInputSourceLock"]
         ),
     ],
     targets: [
         .executableTarget(
-            name: "MacStaticLanguage",
-            path: "Sources/MacStaticLanguage"
+            name: "MacInputSourceLock",
+            path: "Sources/MacInputSourceLock"
         ),
     ]
 )

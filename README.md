@@ -1,6 +1,6 @@
-# MacStaticLanguage
+# MacInputSourceLock
 
-MacStaticLanguage is a native macOS menu bar utility that forces the keyboard input source back to English when focus changes between apps or windows.
+MacInputSourceLock is a native macOS menu bar utility that forces the keyboard input source back to English when focus changes between apps or windows.
 
 It is intended for the specific macOS behavior where input language follows the last active window, document, or Spotlight session. With this app running, the system is pushed back to a fixed English layout after those focus changes happen.
 
@@ -27,7 +27,7 @@ By default, the enforced input source is:
 
 ## Permissions
 
-MacStaticLanguage requires this macOS permission:
+MacInputSourceLock requires this macOS permission:
 
 - `Accessibility`
 
@@ -38,10 +38,10 @@ It uses Accessibility APIs to detect the focused app, focused window, and focuse
 After cloning the repository:
 
 ```bash
-git clone <repo-url>
-cd macstaticlanguage
+git clone https://github.com/dps999/MacInputSourceLock.git
+cd macinputsourcelock
 swift build -c release
-./.build/release/MacStaticLanguage
+./.build/release/MacInputSourceLock
 ```
 
 On first launch, macOS should ask for Accessibility permission. Approve it in:
@@ -71,13 +71,13 @@ swift build -c release
 Run the debug build with SwiftPM:
 
 ```bash
-swift run MacStaticLanguage
+swift run MacInputSourceLock
 ```
 
 Run the compiled release binary directly:
 
 ```bash
-./.build/release/MacStaticLanguage
+./.build/release/MacInputSourceLock
 ```
 
 ## Choose the English Layout
@@ -85,7 +85,7 @@ Run the compiled release binary directly:
 List available selectable keyboard layouts:
 
 ```bash
-swift run MacStaticLanguage --list-input-sources
+swift run MacInputSourceLock --list-input-sources
 ```
 
 Example output:
@@ -99,13 +99,13 @@ Example output:
 To use `US` instead of `ABC`:
 
 ```bash
-swift run MacStaticLanguage --input-source-id com.apple.keylayout.US
+swift run MacInputSourceLock --input-source-id com.apple.keylayout.US
 ```
 
 You can also use an environment variable:
 
 ```bash
-MACSTATICLANGUAGE_INPUT_SOURCE_ID=com.apple.keylayout.US swift run MacStaticLanguage
+MACINPUTSOURCELOCK_INPUT_SOURCE_ID=com.apple.keylayout.US swift run MacInputSourceLock
 ```
 
 ## Menu Bar Usage
@@ -130,7 +130,7 @@ The simplest way is from the tray menu:
 
 This creates a LaunchAgent in:
 
-`~/Library/LaunchAgents/com.macstaticlanguage.agent.plist`
+`~/Library/LaunchAgents/com.macinputsourcelock.agent.plist`
 
 The startup item does not change the permission model. The launched app still needs `Accessibility` permission.
 
@@ -144,7 +144,7 @@ chmod +x Scripts/install-launch-agent.sh Scripts/uninstall-launch-agent.sh
 To install startup with a different layout:
 
 ```bash
-MACSTATICLANGUAGE_INPUT_SOURCE_ID=com.apple.keylayout.US ./Scripts/install-launch-agent.sh
+MACINPUTSOURCELOCK_INPUT_SOURCE_ID=com.apple.keylayout.US ./Scripts/install-launch-agent.sh
 ```
 
 To remove startup:
@@ -168,13 +168,13 @@ To remove startup:
 Check that the process is running:
 
 ```bash
-pgrep -fl MacStaticLanguage
+pgrep -fl MacInputSourceLock
 ```
 
 If it is installed at startup, check the LaunchAgent:
 
 ```bash
-launchctl print gui/$UID/com.macstaticlanguage.agent
+launchctl print gui/$UID/com.macinputsourcelock.agent
 ```
 
 Practical test:
@@ -195,28 +195,28 @@ If the app starts but does not switch layouts:
 If the Accessibility prompt does not appear:
 
 ```bash
-swift run MacStaticLanguage
+swift run MacInputSourceLock
 ```
 
 Then add the executable manually in Accessibility settings.
 
 If you want to add the debug binary manually, it is usually here:
 
-`/Users/.../macstaticlanguage/.build/debug/MacStaticLanguage`
+`/Users/.../macinputsourcelock/.build/debug/MacInputSourceLock`
 
 If you run the release build, use the release binary path instead:
 
-`/Users/.../macstaticlanguage/.build/release/MacStaticLanguage`
+`/Users/.../macinputsourcelock/.build/release/MacInputSourceLock`
 
 ## Repository Layout
 
 ```text
-Sources/MacStaticLanguage/
+Sources/MacInputSourceLock/
   Configuration.swift
   InputSourceManager.swift
   LanguageEnforcer.swift
   LaunchAgentManager.swift
-  MacStaticLanguageApp.swift
+  MacInputSourceLockApp.swift
   StatusItemController.swift
 
 Scripts/
