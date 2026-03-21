@@ -19,12 +19,16 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_DIR="$DIST_DIR/$APP_NAME.app"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
+RESOURCES_DIR="$CONTENTS_DIR/Resources"
 PLIST_PATH="$CONTENTS_DIR/Info.plist"
 PKGINFO_PATH="$CONTENTS_DIR/PkgInfo"
 EXECUTABLE_PATH="$BUILD_DIR/$APP_NAME"
+ICON_SOURCE_PATH="$ROOT_DIR/Assets/AppIcon.icns"
+ICON_OUTPUT_PATH="$RESOURCES_DIR/AppIcon.icns"
 ZIP_PATH="$DIST_DIR/$APP_NAME-$VERSION_LABEL-macos-$ARCH.zip"
 
 cd "$ROOT_DIR"
+zsh "$ROOT_DIR/Scripts/build-app-icon.sh" >/dev/null
 swift build -c release
 
 if [[ ! -x "$EXECUTABLE_PATH" ]]; then
@@ -33,10 +37,12 @@ if [[ ! -x "$EXECUTABLE_PATH" ]]; then
 fi
 
 rm -rf "$APP_DIR"
-mkdir -p "$MACOS_DIR"
+mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
 cp "$EXECUTABLE_PATH" "$MACOS_DIR/$APP_NAME"
 chmod +x "$MACOS_DIR/$APP_NAME"
+cp "$ICON_SOURCE_PATH" "$ICON_OUTPUT_PATH"
+find "$ROOT_DIR/.build" -path "*/release/*.bundle" -exec cp -R {} "$RESOURCES_DIR/" \;
 
 cat > "$PLIST_PATH" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -53,6 +59,8 @@ cat > "$PLIST_PATH" <<PLIST
     <string>$BUNDLE_IDENTIFIER</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleName</key>
     <string>$APP_NAME</string>
     <key>CFBundlePackageType</key>

@@ -44,11 +44,22 @@ final class StatusItemController: NSObject {
             return
         }
 
-        button.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MacInputSourceLock")
-        button.image?.isTemplate = true
-        button.title = " EN"
-        button.imagePosition = .imageLeading
+        button.image = makeStatusBarIcon()
+        button.image?.size = NSSize(width: 18, height: 18)
+        button.imagePosition = .imageOnly
         button.toolTip = "MacInputSourceLock"
+    }
+
+    private func makeStatusBarIcon() -> NSImage {
+        guard
+            let url = Bundle.module.url(forResource: "TrayIcon", withExtension: "png"),
+            let image = NSImage(contentsOf: url)
+        else {
+            return NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MacInputSourceLock") ?? NSImage()
+        }
+
+        image.isTemplate = false
+        return image
     }
 
     private func configureMenu() {

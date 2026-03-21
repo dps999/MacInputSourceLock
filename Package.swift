@@ -16,7 +16,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "MacInputSourceLock",
-            path: "Sources/MacInputSourceLock"
+            path: "Sources/MacInputSourceLock",
+            resources: [
+                .process("Resources"),
+            ]
         ),
     ]
 )
