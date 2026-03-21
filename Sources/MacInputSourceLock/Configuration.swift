@@ -10,12 +10,14 @@ struct Configuration {
     static let defaultPollInterval: TimeInterval = 0.5
 
     static func parse(arguments: [String]) throws -> Configuration {
+        let environment = ProcessInfo.processInfo.environment
+        let launchedByAgent = environment["MACINPUTSOURCELOCK_LAUNCHED_BY_AGENT"] == "1"
         var inputSourceID = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_INPUT_SOURCE_ID"] ?? defaultInputSourceID
         var pollInterval = defaultPollInterval
-        var promptForAccessibility = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT"] != "1"
+        var promptForAccessibility = environment["MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT"] != "1" && !launchedByAgent
         var listInputSources = false
 
-        if let environmentPollInterval = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_POLL_INTERVAL"] {
+        if let environmentPollInterval = environment["MACINPUTSOURCELOCK_POLL_INTERVAL"] {
             guard let value = Double(environmentPollInterval), value > 0 else {
                 throw ConfigurationError.invalidPollInterval(environmentPollInterval)
             }

@@ -63,7 +63,14 @@ final class LanguageEnforcer: NSObject {
     @objc
     private func activeApplicationDidChange(_ notification: Notification) {
         lastFocusSignature = nil
-        evaluateFocusChange(force: true, reason: "application activation")
+        reinforceInputSource(reason: "application activation")
+
+        guard accessibilityTrusted(prompt: false),
+              let signature = currentFocusSignature() else {
+            return
+        }
+
+        lastFocusSignature = signature
     }
 
     private func startMonitoringIfTrusted() {
