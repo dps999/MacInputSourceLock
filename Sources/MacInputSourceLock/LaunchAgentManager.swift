@@ -142,7 +142,6 @@ final class LaunchAgentManager {
             "ProgramArguments": [executableURL.path],
             "EnvironmentVariables": environmentVariables,
             "RunAtLoad": true,
-            "KeepAlive": true,
             "LimitLoadToSessionType": ["Aqua"],
             "StandardOutPath": stdoutLogURL.path,
             "StandardErrorPath": stderrLogURL.path,
