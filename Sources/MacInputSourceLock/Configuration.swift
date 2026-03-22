@@ -4,6 +4,7 @@ struct Configuration {
     let inputSourceID: String
     let pollInterval: TimeInterval
     let promptForAccessibility: Bool
+    let debugLogging: Bool
     let listInputSources: Bool
 
     static let defaultInputSourceID = "com.apple.keylayout.ABC"
@@ -15,6 +16,7 @@ struct Configuration {
         var inputSourceID = ProcessInfo.processInfo.environment["MACINPUTSOURCELOCK_INPUT_SOURCE_ID"] ?? defaultInputSourceID
         var pollInterval = defaultPollInterval
         var promptForAccessibility = environment["MACINPUTSOURCELOCK_NO_ACCESSIBILITY_PROMPT"] != "1" && !launchedByAgent
+        let debugLogging = environment["MACINPUTSOURCELOCK_DEBUG"] == "1"
         var listInputSources = false
 
         if let environmentPollInterval = environment["MACINPUTSOURCELOCK_POLL_INTERVAL"] {
@@ -61,6 +63,7 @@ struct Configuration {
             inputSourceID: inputSourceID,
             pollInterval: pollInterval,
             promptForAccessibility: promptForAccessibility,
+            debugLogging: debugLogging,
             listInputSources: listInputSources
         )
     }
