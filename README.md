@@ -24,6 +24,7 @@ By default, the enforced input source is:
 - macOS 13 or later
 - Xcode 16.4 or a compatible Swift 6 toolchain
 - Accessibility permission for the app
+- Input Monitoring permission for Spotlight shortcut handling
 
 ## Download
 
@@ -41,11 +42,16 @@ xattr -dr com.apple.quarantine /Applications/MacInputSourceLock.app
 
 ## Permissions
 
-MacInputSourceLock requires this macOS permission:
+MacInputSourceLock can require these macOS permissions:
 
 - `Accessibility`
+- `Input Monitoring` for reliable Spotlight shortcut detection
 
 It uses Accessibility APIs to detect the focused app, focused window, and focused UI element. Without that permission, the app can stay running in the menu bar, but it cannot reliably detect focus changes and switch the keyboard layout back to English.
+
+For Spotlight specifically, the app also listens for the system search shortcut such as `Cmd+Space`. On some Macs, macOS will not show an automatic prompt for `Input Monitoring`, so you may need to add the app manually in:
+
+`System Settings > Privacy & Security > Input Monitoring`
 
 ## Quick Start
 
@@ -62,7 +68,11 @@ On first launch, macOS should ask for Accessibility permission. Approve it in:
 
 `System Settings > Privacy & Security > Accessibility`
 
-If the prompt does not appear, launch the app once and add the executable manually in that settings panel.
+For Spotlight shortcut handling, also make sure the app is enabled in:
+
+`System Settings > Privacy & Security > Input Monitoring`
+
+If either prompt does not appear, launch the app once and add the app or executable manually in the relevant settings panel.
 
 When the app is running, you should see a `lock + EN` item in the menu bar.
 
@@ -159,7 +169,7 @@ This creates a LaunchAgent in:
 
 `~/Library/LaunchAgents/com.macinputsourcelock.agent.plist`
 
-The startup item does not change the permission model. The launched app still needs `Accessibility` permission.
+The startup item does not change the permission model. The launched app still needs `Accessibility` permission and may also need `Input Monitoring` if you want Spotlight shortcut handling to work reliably.
 
 You can also install startup manually:
 
@@ -215,6 +225,7 @@ Practical test:
 If the app starts but does not switch layouts:
 
 - Confirm Accessibility permission is granted.
+- If Spotlight still stays in the previous language, confirm Input Monitoring permission is granted.
 - Open the tray menu and check the status text.
 - Make sure the target input source ID exists on your Mac.
 - Run `--list-input-sources` and use the exact ID returned by macOS.
@@ -226,6 +237,10 @@ swift run MacInputSourceLock
 ```
 
 Then add the executable manually in Accessibility settings.
+
+If Spotlight opens but the language does not switch back to English, add the app manually in Input Monitoring settings:
+
+`System Settings > Privacy & Security > Input Monitoring`
 
 If you want to add the debug binary manually, it is usually here:
 
